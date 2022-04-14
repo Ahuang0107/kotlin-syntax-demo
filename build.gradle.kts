@@ -13,13 +13,15 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
-    testImplementation(platform("org.junit:junit-bom:5.8.2"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
     implementation("com.alibaba:easyexcel:3.0.5")
-    implementation(kotlin("reflect"))
+
+    testImplementation(kotlin("test"))
+    testImplementation(platform("org.junit:junit-bom:5.8.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
 tasks.test {

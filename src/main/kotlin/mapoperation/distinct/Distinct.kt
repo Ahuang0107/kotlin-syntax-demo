@@ -1,0 +1,3 @@
+package mapoperation.distinct
+
+interface Distinct
