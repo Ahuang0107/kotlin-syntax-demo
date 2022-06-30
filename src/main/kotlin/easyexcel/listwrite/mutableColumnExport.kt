@@ -1,6 +1,8 @@
 package easyexcel.listwrite
 
+import com.alibaba.excel.ExcelWriter
 import com.alibaba.excel.write.builder.ExcelWriterBuilder
+import com.alibaba.excel.write.builder.ExcelWriterSheetBuilder
 import java.io.File
 import java.math.BigDecimal
 
@@ -9,35 +11,42 @@ fun main() {
     val folder = File("upload", "easy_excel").also { if (!it.exists()) it.mkdirs() }
     val file = File(folder, "test1.xlsx")
 
-    val excelWriter = ExcelWriterBuilder()
-        .registerWriteHandler(RetainReportDetailHeadStyle)
-        .registerWriteHandler(RetainReportDetailCellWriteHandler())
     val dataList = data()
 
-    val head = dataList.firstOrNull()?.keys?.map { listOf(it) }
-    val data = dataList.map {
-        it.values
+    RetainReportWriter().file(file)
+        .write("Total", dataList)
+        .write("Detail", dataList)
+        .write("Empty", dataList)
+        .finish()
+}
+
+class RetainReportWriter {
+    companion object {
+        val excelWriterBuilder: ExcelWriterBuilder = ExcelWriterBuilder()
+            .registerWriteHandler(RetainReportDetailHeadStyle)
+            .registerWriteHandler(RetainReportDetailCellWriteHandler())
+        val excelWriterSheetBuilder: ExcelWriterSheetBuilder = ExcelWriterSheetBuilder()
     }
 
-    /* todo 如何在按照 list 来设置 head 时也能设置格式 */
-    excelWriter
-        .file(file)
-        .build()
-        .also { workbook ->
-            val head = dataList.firstOrNull()?.keys?.map { listOf(it) }
-            val data = dataList.map {
-                it.values
-            }
-            val writeSheet = excelWriter.sheet("Total").head(head).build()
-            workbook.write(data, writeSheet)
-        }.also { workbook ->
-            val head = dataList.firstOrNull()?.keys?.map { listOf(it) }
-            val data = dataList.map {
-                it.values
-            }
-            val writeSheet = excelWriter.sheet("Detail").head(head).build()
-            workbook.write(data, writeSheet)
-        }.finish()
+    private lateinit var writer: ExcelWriter
+
+    fun file(file: File): RetainReportWriter {
+        writer = excelWriterBuilder.file(file).build()
+        return this
+    }
+
+    fun write(
+        sheetName: String,
+        data: List<Map<String, Any?>>
+    ): RetainReportWriter {
+        val head = data.firstOrNull()?.keys?.map { listOf(it) }
+        writer.write(data.map { it.values }, excelWriterSheetBuilder.sheetName(sheetName).head(head).build())
+        return this
+    }
+
+    fun finish() {
+        writer.finish()
+    }
 }
 
 fun data(): List<Map<String, Any?>> {
@@ -56,12 +65,8 @@ fun data(): List<Map<String, Any?>> {
             Pair("2022_04_01", BigDecimal(40.00)),
             Pair("2022_04_08", null),
             Pair("2022_04_15", "-20"),
-            Pair("2022_04_13", "10"),
+            Pair("2022_04_13", 0),
             Pair("2022_04_23", "10"),
         ),
     )
 }
-
-data class ReportDetailDto(
-    var id: Long? = null
-)
