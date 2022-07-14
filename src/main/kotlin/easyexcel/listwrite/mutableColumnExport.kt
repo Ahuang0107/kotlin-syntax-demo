@@ -11,22 +11,19 @@ fun main() {
     val folder = File("upload", "easy_excel").also { if (!it.exists()) it.mkdirs() }
     val file = File(folder, "test1.xlsx")
 
-    val dataList = data()
+    val dataList = mockDate()
 
     RetainReportWriter().file(file)
         .write("Total", dataList)
         .write("Detail", dataList)
-        .write("Empty", dataList)
         .finish()
 }
 
 class RetainReportWriter {
-    companion object {
-        val excelWriterBuilder: ExcelWriterBuilder = ExcelWriterBuilder()
-            .registerWriteHandler(RetainReportDetailHeadStyle)
-            .registerWriteHandler(RetainReportDetailCellWriteHandler())
-        val excelWriterSheetBuilder: ExcelWriterSheetBuilder = ExcelWriterSheetBuilder()
-    }
+    private val excelWriterBuilder: ExcelWriterBuilder = ExcelWriterBuilder()
+        .registerWriteHandler(RetainReportDetailHeadStyle)
+        .registerWriteHandler(RetainReportDetailCellWriteHandler())
+    private val excelWriterSheetBuilder: ExcelWriterSheetBuilder = ExcelWriterSheetBuilder()
 
     private lateinit var writer: ExcelWriter
 
@@ -49,7 +46,7 @@ class RetainReportWriter {
     }
 }
 
-fun data(): List<Map<String, Any?>> {
+fun mockDate(): List<Map<String, Any?>> {
     return listOf(
         mapOf(
             Pair("engage_code", "2033874"),
@@ -62,10 +59,9 @@ fun data(): List<Map<String, Any?>> {
         mapOf(
             Pair("engage_code", "342179"),
             Pair("member_gpn", "CN1002138"),
-            Pair("2022_04_01", BigDecimal(40.00)),
+            Pair("2022_04_01", BigDecimal(-40.00)),
             Pair("2022_04_08", null),
             Pair("2022_04_15", "-20"),
-            Pair("2022_04_13", 0),
             Pair("2022_04_23", "10"),
         ),
     )
